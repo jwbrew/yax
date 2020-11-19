@@ -131,9 +131,11 @@ defmodule QueryParser do
     field
     |> optional(group)
 
-  defparsec :select,
-            repeat(
-              wrap(token)
-              |> ignore(separator)
-            )
+  defparsec(
+    :select,
+    repeat(
+      wrap(token)
+      |> ignore(separator)
+    )
+  )
 end
