@@ -1,24 +1,27 @@
 # Yax
 
 Yet Another Query Syntax (but X because Elixir)
+
 ...for Elixir
+
 ......and [Ecto](https://hexdocs.pm/ecto/Ecto.html)
+
 .........and [Bodyguard](https://hexdocs.pm/bodyguard/readme.html)
 
 N.B - you're reading the readme for the very first commit on this project
-In no way is this production ready, or even all that good. Even this readme
-is just some verbal diarrhea, written down. 
+
+In no way is this production ready, or even all that good. Even this readme is just some verbal diarrhea, written down. 
 
 This package just explores a few ideas: 
 
 - GraphQL is awesome but integrating it with a Phoenix app is not. You hide 
 everything behind a single endpoint and lose all the goodstuff that Plug, 
-Phoenix (and HTTP) have to offer.
+Phoenix, and HTTP (!) have to offer.
 
 - Data queries are inherently different from mutations. GraphQL models this, 
 CQRS does this too. It's nothing earth-shattering, more of just a principal.
 
-- We're only concerned with queries, so mutation permissioninig provided 
+- We're only concerned with queries, so mutation permissioning provided 
 by the likes of [Canada](https://github.com/jarednorman/canada) are a different
 beast altogether.
 
@@ -35,7 +38,7 @@ apps makes it very easy to slip up
   - Completely drop the ball and forget to scope or check a policy on a route
 
 Yax does that all for you. Yax converts a URL query schema into a *properly scoped* 
-Ecto query. (**Immense** amounts of kudos and respect to the folks behind [Postgrest](http://postgrest.org/en/v7.0.0/api.html# for the API), 
+Ecto query. (**Immense** amounts of kudos and respect to the folks behind [Postgrest](http://postgrest.org/en/v7.0.0/api.html) for the API, 
 it's the best in its class I've used and heavily inspires the query syntax here. If you need a pure data play, then use Postgrest. If you 
 need integration into an application layer...keep reading.
 
@@ -45,7 +48,7 @@ Let your controllers look like this:
 
 ```
 defmodule FooWeb.PostController do 
-  plug Yax.Plug
+  plug Yax.Plug, Foo.Posts.Post
   def index(conn, _params), do: json(conn, Yax.all(conn))
   def show(conn, _params) do json(conn, Yax.one(conn))
 end
@@ -58,7 +61,9 @@ and let your client decide what they need:
 Yax will introspect your Ecto schemas, preload your assocations, scope everything, and give you back 
 just what you asked for. And just what your user is allowed.
 
-Suddenly, your GraphQL Query definitions have turned back into good old Phoenix routes.
+Suddenly, your GraphQL Query definitions have turned back into good old Phoenix routes. We can compose them,
+add them to pipelines. They become part of the Phoenix ecosystem, not an entity on their own. Yet we still 
+retain the consistent schema and reliable response types that GQL offers.
 
 It doesn't end there. (well, it does right now, but this is definitely something that needs to exist:)
 
@@ -72,10 +77,10 @@ What controller?
   get("/posts", Yax.Controller, Foo.Posts.Post)
 ```
 
-I mean really we don't even need that first route. `GET /posts?id=1` is the same as `GET /posts/1`, right? 
-If anything it's clearer.
+I mean really we don't even need that first route. `GET /posts?id=1` is the same as `GET /posts/1`, right?
+If anything it's clearer. Well, sort of.
 
-Suddenly it's all disappeared. You've gone from `Ecto model -> Context -> Policy/Scope -> Controller -> Router -> User`
+Suddenly it's all disappeared. You've gone from `Ecto model -> Context <-> Policy/Scope -> Controller -> Router -> User`
 
 Why don't we just go `Ecto model -> Router -> User`?
 
@@ -83,7 +88,8 @@ That's Yax.
 
 /brain dump
 
-Like the idea? Get in touch. 
+Like the idea? Get in touch. We're using this for [Codex](https://codex.jbrew.co.uk/), so expect active
+development.
 
 
 ## Installation
